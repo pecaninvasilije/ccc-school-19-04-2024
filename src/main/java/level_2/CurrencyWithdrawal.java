@@ -1,55 +1,67 @@
 package level_2;
 
+import java.io.*;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class CurrencyWithdrawal {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String filename = "D:\\OutsourcedIdeaProject\\ccc-school-19-04-2024\\src\\main\\resources\\level2\\2_1.txt";  // Reading filename from input
+        String inputFile = "D:\\OutsourcedIdeaProject\\ccc-school-19-04-2024\\src\\main\\resources\\level2\\level2_example.in";  // Input file path
+        String outputFile = "D:\\OutsourcedIdeaProject\\ccc-school-19-04-2024\\src\\main\\resources\\level2\\example2.txt"; // Output file path
 
-        try (FileWriter writer = new FileWriter(filename)) {
-            int N = Integer.parseInt(scanner.nextLine().trim());  // Number of currencies
-            int C = Integer.parseInt(scanner.nextLine().trim());  // Number of coins per currency
-            int A = Integer.parseInt(scanner.nextLine().trim());  // Number of amounts per currency
+        try (Scanner scanner = new Scanner(new File(inputFile));
+             PrintWriter writer = new PrintWriter(new File(outputFile))) {
+
+            if (!scanner.hasNextInt()) return; // Check if there's an integer to read
+            int N = scanner.nextInt(); // Read the number of currencies
 
             for (int i = 0; i < N; i++) {
-                String[] coinStrings = scanner.nextLine().split(" ");
+                if (!scanner.hasNextInt()) return; // Check if there's an integer to read
+                int C = scanner.nextInt(); // Number of coin values
                 int[] coins = new int[C];
-                Map<Integer, Integer> coinMap = new HashMap<>();
+
                 for (int j = 0; j < C; j++) {
-                    coins[j] = Integer.parseInt(coinStrings[j]);
-                    coinMap.put(coins[j], coinMap.getOrDefault(coins[j], 0) + 1);
+                    if (!scanner.hasNextInt()) return; // Check if there's an integer to read
+                    coins[j] = scanner.nextInt();
                 }
 
-                String[] amountStrings = scanner.nextLine().split(" ");
-                for (int k = 0; k < A; k++) {
-                    int amount = Integer.parseInt(amountStrings[k]);
-                    String result = findPairs(coins, coinMap, amount);
-                    writer.write(result + "\n");  // Writing each result followed by a new line
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
-    }
+                if (!scanner.hasNextInt()) return; // Check if there's an integer to read
+                int A = scanner.nextInt(); // Number of amounts
+                int[] amounts = new int[A];
 
-    private static String findPairs(int[] coins, Map<Integer, Integer> coinMap, int amount) {
-        for (int coin : coins) {
-            int needed = amount - coin;
-            if (needed == coin) {
-                if (coinMap.get(coin) >= 2) {  // Check if there are at least two of the same coin
-                    return coin + " " + coin;
+                for (int j = 0; j < A; j++) {
+                    if (!scanner.hasNextInt()) return; // Check if there's an integer to read
+                    amounts[j] = scanner.nextInt();
                 }
-            } else if (coinMap.containsKey(needed)) {
-                return coin + " " + needed;  // Returning the first pair found
+
+                // Find and write pairs for each amount
+                for (int amount : amounts) {
+                    boolean found = false;
+                    Map<Integer, Integer> map = new HashMap<>();
+                    for (int coin : coins) {
+                        int complement = amount - coin;
+                        if (map.containsKey(complement)) {
+                            writer.println(complement + " " + coin);
+                            found = true;
+                            break;
+                        }
+                        map.put(coin, 1);
+                    }
+
+                    if (!found) {
+                        // Check if a coin can be used twice
+                        for (int coin : coins) {
+                            if (2 * coin == amount) {
+                                writer.println(coin + " " + coin);
+                                break;
+                            }
+                        }
+                    }
+                }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + e.getMessage());
         }
-        return "";  // Should not happen as per problem statement that every amount has a solution
     }
 }
