@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,13 +18,19 @@ public class Level_2 {
 
     public static void findCoins(int[][] currencies, int[][] amounts) {
         for (int i = 0; i < currencies.length; i++) {
+            Arrays.sort(currencies[i]);
             for (int amount : amounts[i]) {
+                boolean pairFound = false;
                 for (int coin1 : currencies[i]) {
                     for (int coin2 : currencies[i]) {
                         if (coin1 + coin2 == amount) {
                             System.out.println(coin1 + " " + coin2);
+                            pairFound = true;
                             break;
                         }
+                    }
+                    if (pairFound) {
+                        break;
                     }
                 }
             }
